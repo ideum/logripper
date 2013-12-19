@@ -8,7 +8,6 @@ module Logripper
 
     def find(url)
       parsed_lines.find_all do |line|
-        next if line.nil?
         line[:url] == url
       end.force
     end
@@ -28,14 +27,14 @@ module Logripper
 
     def parsed_lines
       log_file.each_line.lazy.map do |line|
-        parsed_line = COMMON_LOG_FORMAT_REGEX.match(line)
+        parsed_line = COMMON_LOG_FORMAT_REGEX.match(line) or next
         {
           timestamp: DateTime.strptime(parsed_line[:timestamp], '%d/%b/%Y:%H:%M:%S %z'),
           method: parsed_line[:method],
           url: parsed_line[:url],
           status: parsed_line[:status].to_i
         }
-      end
+      end.reject(&:nil?)
     end
   end
 end
