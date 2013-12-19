@@ -8,9 +8,9 @@ Gem::Specification.new do |spec|
   spec.version       = Logripper::VERSION
   spec.authors       = ["Ben Cates"]
   spec.email         = ["ben@ideum.com"]
-  spec.description   = %q{Tool for parsing metrics from logs and publishing to Google Docs}
-  spec.summary       = %q{Tool for parsing metrics from logs and publishing to Google Docs}
-  spec.homepage      = ""
+  spec.description   = %q{Tool for parsing metrics from logs}
+  spec.summary       = %q{Tool for parsing metrics from logs}
+  spec.homepage      = "https://github.com/ideum/logripper"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)
