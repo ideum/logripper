@@ -14,6 +14,11 @@ describe Logripper::Parser do
 This is an intentionally malformed row
   LOG_SNIPPET
 
+  let(:status_failures_pseudofile) { StringIO.new(<<-LOG_SNIPPET, 'r') }
+192.168.0.1 - - [19/Dec/2013:00:00:00 +0000] "GET /test HTTP/1.1" 401 0 "-" "-"
+192.168.0.1 - - [19/Dec/2013:00:00:00 +0000] "GET /test HTTP/1.1" 200 0 "-" "-"
+  LOG_SNIPPET
+
   subject(:parser) { Logripper::Parser.new(log_pseudofile) }
 
   describe '#find' do
@@ -47,6 +52,11 @@ This is an intentionally malformed row
         { date: Date.new(2013, 12, 19), count: 2 },
         { date: Date.new(2013, 12, 20), count: 1 }
       ]
+    end
+
+    it "skips unsuccessful entries" do
+      parser = Logripper::Parser.new(status_failures_pseudofile)
+      parser.filter_by_date('/test').first[:count].should == 1
     end
   end
 end

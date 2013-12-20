@@ -14,8 +14,10 @@ module Logripper
 
     def filter_by_date(url)
       find(url).reduce(Hash.new(0)) do |dates, line|
-        date = line[:timestamp].to_date
-        dates[date] += 1
+        if line[:status].between? 200, 299
+          date = line[:timestamp].to_date
+          dates[date] += 1
+        end
         dates
       end.map do |date, count|
         {date: date, count: count}
