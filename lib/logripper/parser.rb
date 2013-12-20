@@ -9,7 +9,7 @@ module Logripper
     def find(url)
       parsed_lines.find_all do |line|
         line[:url] == url
-      end.force
+      end
     end
 
     private

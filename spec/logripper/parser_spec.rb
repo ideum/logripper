@@ -16,7 +16,7 @@ This is an intentionally malformed row
   subject(:parser) { Logripper::Parser.new(log_pseudofile) }
 
   describe '#find' do
-    subject(:results) { parser.find('/alive.txt') }
+    subject(:results) { parser.find('/alive.txt').force }
 
     it "filters by URL" do
       results.length.should == 2
