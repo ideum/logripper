@@ -5,6 +5,7 @@ describe Logripper::Parser do
   let(:log_pseudofile) { StringIO.new(<<-LOG_SNIPPET, 'r') }
 64.49.91.30 - - [19/Dec/2013:17:12:02 +0000] "GET /alive.txt HTTP/1.1" 200 6 "-" "-"
 173.163.247.62 - - [19/Dec/2013:17:12:06 +0000] "GET /alive.txt HTTP/1.1" 200 6 "-" "-"
+173.163.247.65 - - [20/Dec/2013:14:51:26 +0000] "GET /alive.txt HTTP/1.1" 200 6 "-" "-"
 54.247.188.179 - - [19/Dec/2013:17:12:22 +0000] "HEAD / HTTP/1.0" 200 0 "-" "NewRelicPinger/1.0 (370512)"
   LOG_SNIPPET
 
@@ -19,7 +20,7 @@ This is an intentionally malformed row
     subject(:results) { parser.find('/alive.txt').force }
 
     it "filters by URL" do
-      results.length.should == 2
+      results.length.should == 3
     end
 
     it "handles malformed lines" do
@@ -35,6 +36,17 @@ This is an intentionally malformed row
       its([:method])    { should == 'GET' }
       its([:url])       { should == '/alive.txt' }
       its([:status])    { should == 200 }
+    end
+  end
+
+  describe '#filter_by_date' do
+    subject(:results) { parser.filter_by_date('/alive.txt') }
+
+    it "returns a count of URLs by date" do
+      results.should == [
+        { date: Date.new(2013, 12, 19), count: 2 },
+        { date: Date.new(2013, 12, 20), count: 1 }
+      ]
     end
   end
 end

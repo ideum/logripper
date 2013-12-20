@@ -12,6 +12,16 @@ module Logripper
       end
     end
 
+    def filter_by_date(url)
+      find(url).reduce(Hash.new(0)) do |dates, line|
+        date = line[:timestamp].to_date
+        dates[date] += 1
+        dates
+      end.map do |date, count|
+        {date: date, count: count}
+      end
+    end
+
     private
 
     COMMON_LOG_FORMAT_REGEX = %r{\A
