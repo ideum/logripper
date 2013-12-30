@@ -8,7 +8,7 @@ module Logripper
 
     def find(url)
       parsed_lines.find_all do |line|
-        line[:url] == url
+        line[:url].include? url
       end
     end
 

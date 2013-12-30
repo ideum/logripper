@@ -28,6 +28,10 @@ This is an intentionally malformed row
       results.length.should == 3
     end
 
+    it "filters by partial URL" do
+      parser.find('/alive').force.length.should == 3
+    end
+
     it "handles malformed lines" do
       expect {
         Logripper::Parser.new(malformed_log_pseudofile).find('/alive.txt')
