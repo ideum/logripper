@@ -24,8 +24,6 @@ module Logripper
       end
     end
 
-    private
-
     COMMON_LOG_FORMAT_REGEX = %r{\A
       (?<ip_address>\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3})
       \s-\s-\s
@@ -33,7 +31,7 @@ module Logripper
       "(?<method>[A-Z]+)\s(?<url>.+)\sHTTP/1\.[01]"\s
       (?<status>\d{3})\s
       (?<bytes_sent>\d+)\s
-      (["](?<refferer>(\-)|(.+))["])\s
+      (["](?<referer>(\-)|(.+))["])\s
       (["](?<useragent>.+)["])
     \Z}x
 
@@ -41,10 +39,14 @@ module Logripper
       log_file.each_line.lazy.map do |line|
         parsed_line = COMMON_LOG_FORMAT_REGEX.match(line) or next
         {
+          ip_address: parsed_line[:ip_address],
           timestamp: DateTime.strptime(parsed_line[:timestamp], '%d/%b/%Y:%H:%M:%S %z'),
           method: parsed_line[:method],
           url: parsed_line[:url],
-          status: parsed_line[:status].to_i
+          status: parsed_line[:status].to_i,
+          bytes_sent: parsed_line[:bytes_sent],
+          referer: parsed_line[:referer] == '-' ? nil : parsed_line[:referer],
+          useragent: parsed_line[:useragent] == '-' ? nil : parsed_line[:useragent]
         }
       end.reject(&:nil?)
     end
