@@ -1,6 +1,7 @@
 require "logripper/version"
 
-require 'logripper/parser'
+require 'logripper/importer'
 require 'logripper/exporter'
+require 'logripper/queries'
 
 module Logripper; end

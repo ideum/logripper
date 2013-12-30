@@ -2,19 +2,20 @@ require 'csv'
 
 module Logripper
   class Exporter
-    attr_reader :data
-
     def initialize(data)
       @data = data
     end
 
     def to_csv
       CSV.generate do |csv|
-        csv << data.first.keys
-        data.each do |entry|
-          csv << entry.values
+        data.each do |line|
+          csv << line
         end
       end
     end
+
+    private
+
+    attr_reader :data
   end
 end

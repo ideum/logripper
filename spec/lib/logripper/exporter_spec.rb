@@ -4,9 +4,10 @@ require 'logripper/exporter'
 describe Logripper::Exporter do
   let(:parsed_log) {
     [
-      {timestamp: DateTime.new(2013, 1, 1, 0, 0, 0), method: 'GET', url: '/test/1', status: 200},
-      {timestamp: DateTime.new(2013, 1, 1, 0, 5, 0), method: 'GET', url: '/test/2', status: 200},
-    ].lazy # logs are returned as lazy enumerators
+      %w(timestamp method url status),
+      [DateTime.new(2013, 1, 1, 0, 0, 0), 'GET', '/test/1', 200],
+      [DateTime.new(2013, 1, 1, 0, 5, 0), 'GET', '/test/2', 200],
+    ]
   }
 
   subject(:exporter) { Logripper::Exporter.new(parsed_log) }

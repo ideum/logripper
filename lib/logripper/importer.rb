@@ -1,10 +1,11 @@
+require 'sqlite3'
 require 'logripper/parser'
 
 module Logripper
   class Importer
     attr_reader :db
 
-    def initialize(log_file, db = "tmp/test.db")
+    def initialize(log_file, db = "db/log.db")
       @log_file = Parser.new log_file
 
       @db = SQLite3::Database.new db
@@ -28,24 +29,26 @@ module Logripper
         SELECT MAX(timestamp) FROM log_entries
       SQL
 
-      @log_file.parsed_lines.each do |line|
-        line_timestamp = line[:timestamp].strftime('%s').to_i
+      db.transaction do
+        @log_file.parsed_lines.each do |line|
+          line_timestamp = line[:timestamp].strftime('%s').to_i
 
-        next if line_timestamp < max_timestamp
+          next if line_timestamp < max_timestamp
 
-        @db.prepare <<-SQL do |stmt|
-          INSERT INTO log_entries VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        SQL
-          stmt.execute(
-            line[:ip_address],
-            line_timestamp,
-            line[:method],
-            line[:url],
-            line[:status],
-            line[:bytes_sent],
-            line[:referer],
-            line[:useragent]
-          )
+          @db.prepare <<-SQL do |stmt|
+            INSERT INTO log_entries VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+          SQL
+            stmt.execute(
+              line[:ip_address],
+              line_timestamp,
+              line[:method],
+              line[:url],
+              line[:status],
+              line[:bytes_sent],
+              line[:referer],
+              line[:useragent]
+            )
+          end
         end
       end
     end
