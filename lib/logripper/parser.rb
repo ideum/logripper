@@ -2,28 +2,6 @@ module Logripper
   class Parser
     attr_reader :log_file
 
-    def initialize(log_file)
-      @log_file = log_file
-    end
-
-    def find(url)
-      parsed_lines.find_all do |line|
-        line[:url].include? url
-      end
-    end
-
-    def filter_by_date(url)
-      find(url).reduce(Hash.new(0)) do |dates, line|
-        if line[:status].between? 200, 299
-          date = line[:timestamp].to_date
-          dates[date] += 1
-        end
-        dates
-      end.map do |date, count|
-        {date: date, count: count}
-      end
-    end
-
     COMMON_LOG_FORMAT_REGEX = %r{\A
       (?<ip_address>\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3})
       \s-\s-\s
@@ -35,6 +13,10 @@ module Logripper
       (["](?<useragent>.+)["])
     \Z}x
 
+    def initialize(log_file)
+      @log_file = log_file
+    end
+
     def parsed_lines
       log_file.each_line.lazy.map do |line|
         parsed_line = COMMON_LOG_FORMAT_REGEX.match(line) or next
@@ -44,7 +26,7 @@ module Logripper
           method: parsed_line[:method],
           url: parsed_line[:url],
           status: parsed_line[:status].to_i,
-          bytes_sent: parsed_line[:bytes_sent],
+          bytes_sent: parsed_line[:bytes_sent].to_i,
           referer: parsed_line[:referer] == '-' ? nil : parsed_line[:referer],
           useragent: parsed_line[:useragent] == '-' ? nil : parsed_line[:useragent]
         }

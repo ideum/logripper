@@ -14,53 +14,34 @@ describe Logripper::Parser do
 This is an intentionally malformed row
   LOG_SNIPPET
 
-  let(:status_failures_pseudofile) { StringIO.new(<<-LOG_SNIPPET, 'r') }
-192.168.0.1 - - [19/Dec/2013:00:00:00 +0000] "GET /test HTTP/1.1" 401 0 "-" "-"
-192.168.0.1 - - [19/Dec/2013:00:00:00 +0000] "GET /test HTTP/1.1" 200 0 "-" "-"
-  LOG_SNIPPET
+  let(:parser) { Logripper::Parser.new(log_pseudofile) }
 
-  subject(:parser) { Logripper::Parser.new(log_pseudofile) }
+  describe '#parsed_lines' do
+    let(:results) { parser.parsed_lines.force }
 
-  describe '#find' do
-    subject(:results) { parser.find('/alive.txt').force }
-
-    it "filters by URL" do
-      results.length.should == 3
-    end
-
-    it "filters by partial URL" do
-      parser.find('/alive').force.length.should == 3
-    end
-
-    it "handles malformed lines" do
-      expect {
-        Logripper::Parser.new(malformed_log_pseudofile).find('/alive.txt')
-      }.to_not raise_error
+    it "reads the data" do
+      results.length.should == 4
     end
 
     describe 'returned info' do
       subject { results.first }
       
-      its([:timestamp]) { should == DateTime.new(2013, 12, 19, 17, 12, 02) }
-      its([:method])    { should == 'GET' }
-      its([:url])       { should == '/alive.txt' }
-      its([:status])    { should == 200 }
-    end
-  end
-
-  describe '#filter_by_date' do
-    subject(:results) { parser.filter_by_date('/alive.txt') }
-
-    it "returns a count of URLs by date" do
-      results.should == [
-        { date: Date.new(2013, 12, 19), count: 2 },
-        { date: Date.new(2013, 12, 20), count: 1 }
-      ]
+      its([:ip_address]) { should == '64.49.91.30' }
+      its([:timestamp])  { should == DateTime.new(2013, 12, 19, 17, 12, 02) }
+      its([:method])     { should == 'GET' }
+      its([:url])        { should == '/alive.txt' }
+      its([:status])     { should == 200 }
+      its([:bytes_sent]) { should == 6 }
+      its([:referrer])   { should be_nil }
+      its([:useragent])  { should be_nil }
     end
 
-    it "skips unsuccessful entries" do
-      parser = Logripper::Parser.new(status_failures_pseudofile)
-      parser.filter_by_date('/test').first[:count].should == 1
+    context "malformed lines" do
+      let(:parser) { Logripper::Parser.new(malformed_log_pseudofile) }
+
+      it "skips malformed lines" do
+        results.length.should == 1
+      end
     end
   end
 end
