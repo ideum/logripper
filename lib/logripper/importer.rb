@@ -2,11 +2,13 @@ require 'logripper/parser'
 
 module Logripper
   class Importer
-    attr_reader :log_file
+    attr_reader :db
 
-    def initialize(log_file)
+    def initialize(log_file, db = "tmp/test.db")
       @log_file = Parser.new log_file
-      @db = SQLite3::Database.new "tmp/test.db"
+
+      @db = SQLite3::Database.new db
+
       @db.execute <<-SQL
         CREATE TABLE IF NOT EXISTS log_entries (
           ip_address VARCHAR(15) NOT NULL,

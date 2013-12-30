@@ -9,9 +9,9 @@ describe Logripper::Importer do
 173.163.247.65 - - [20/Dec/2013:14:51:26 +0000] "GET /alive.txt HTTP/1.1" 200 6 "-" "-"
   LOG_SNIPPET
 
-  let(:db) { SQLite3::Database.new "tmp/test.db" }
+  let!(:importer) { Logripper::Importer.new(log_pseudofile, ':memory:') }
 
-  let!(:importer) { Logripper::Importer.new(log_pseudofile) }
+  let(:db) { importer.db }
 
   describe '#import' do
     before do
