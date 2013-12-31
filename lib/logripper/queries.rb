@@ -6,7 +6,7 @@ module Logripper
 
     def total_downloads
       @db.execute2 <<-SQL
-        SELECT count(*) as count
+        SELECT COUNT(DISTINCT(ip_address)) as count
         FROM log_entries
         WHERE url LIKE '/system/installers/GestureWorksGameplaySetup_%'
       SQL
