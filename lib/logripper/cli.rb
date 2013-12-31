@@ -3,6 +3,8 @@ require 'logripper'
 
 module Logripper
   class CLI < Thor
+    QUERIES = %w[total_downloads daily_downloads vc_views vc_downloads]
+
     package_name 'logripper'
 
     desc "import LOG", "reads log into local database"
@@ -11,28 +13,19 @@ module Logripper
       Importer.new(log_file).import
     end
 
-    desc "total_downloads", "exports a total trial download count CSV"
-    def total_downloads
-      queries = Queries.new(Importer.new(nil).db)
-      puts Exporter.new(queries.total_downloads).to_csv
-    end
-
-    desc "daily_downloads", "exports a daily trial download count CSV"
-    def daily_downloads
-      queries = Queries.new(Importer.new(nil).db)
-      puts Exporter.new(queries.downloads_by_day).to_csv
-    end
-
-    desc "vc_views", "exports a vc view count CSV"
-    def vc_views
-      queries = Queries.new(Importer.new(nil).db)
-      puts Exporter.new(queries.vc_views).to_csv
-    end
-
-    desc "vc_downloads", "exports a vc download count CSV"
-    def vc_downloads
-      queries = Queries.new(Importer.new(nil).db)
-      puts Exporter.new(queries.vc_downloads).to_csv
+    QUERIES.each do |query|
+      desc query, "exports a report of the #{query}"
+      option :google_username, required: true
+      option :google_password, required: true
+      define_method(query) do
+        queries = Queries.new(Importer.new(nil).db)
+        exporter = Exporter.new(queries.send(query))
+        exporter.to_google_drive(
+          query,
+          google_username: options[:google_username],
+          google_password: options[:google_password]
+        )
+      end
     end
   end
 end

@@ -25,4 +25,5 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "thor", "~> 0.18.1"
   spec.add_dependency "sqlite3", "~> 1.3.8"
+  spec.add_dependency "google_drive"
 end

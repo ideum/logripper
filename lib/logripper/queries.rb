@@ -12,7 +12,7 @@ module Logripper
       SQL
     end
 
-    def downloads_by_day
+    def daily_downloads
       @db.execute2 <<-SQL
         SELECT date(timestamp, 'unixepoch') as day, COUNT(DISTINCT(ip_address)) as count
         FROM log_entries
