@@ -23,7 +23,13 @@ module Logripper
       puts Exporter.new(queries.downloads_by_day).to_csv
     end
 
-    desc "daily_downloads", "exports a daily download count CSV"
+    desc "vc_views", "exports a daily download count CSV"
+    def vc_views
+      queries = Queries.new(Importer.new(nil).db)
+      puts Exporter.new(queries.vc_views).to_csv
+    end
+
+    desc "vc_downloads", "exports a daily download count CSV"
     def vc_downloads
       queries = Queries.new(Importer.new(nil).db)
       puts Exporter.new(queries.vc_downloads).to_csv
